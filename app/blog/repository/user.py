@@ -1,22 +1,22 @@
-
+from fastapi import HTTPException, Response, status
 from sqlalchemy.orm import Session
-from blog import models, schemas
-from fastapi import HTTPException, status
-from blog.hashing import Hash
+
+from app.blog import models, schemas
+
+from ..hashing import Hash
+from ..services import user_service
 
 
-def create(request: schemas.User, db: Session):
-    new_user = models.User(
-        name=request.name, email=request.email, password=Hash.bcrypt(request.password))
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-    return new_user
+def create(data: schemas.UserSignUpBody, response: Response, db: Session):
+    name = data.name
+    email = data.email
+    password = data.password
+    user = user_service.handle_user_sign_up(name, email, password, db)
+    return user.__dict__
 
 
-def show(id: int, db: Session):
-    user = db.query(models.User).filter(models.User.id == id).first()
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"User with the id {id} is not available")
+def login(data: schemas.LoginBody, response: Response, db: Session):
+    email = data.email
+    password = data.password
+    user = user_service.handle_user_login(email, password, db)
     return user
