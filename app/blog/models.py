@@ -6,16 +6,15 @@ from sqlalchemy.orm import relationship
 
 from .database import Base
 
+# class Blog(Base):
+#     __tablename__ = "blogs"
 
-class Blog(Base):
-    __tablename__ = "blogs"
+#     id = Column(Integer, primary_key=True, index=True)
+#     title = Column(String)
+#     body = Column(String)
+#     user_id = Column(Integer, ForeignKey("users.id"))
 
-    id = Column(Integer, primary_key=True, index=True)
-    title = Column(String)
-    body = Column(String)
-    user_id = Column(Integer, ForeignKey("users.id"))
-
-    creator = relationship("User", backref="blogs")
+#     creator = relationship("User", backref="blogs")
 
 
 class User(Base):
@@ -25,7 +24,7 @@ class User(Base):
     name = Column(String)
     email = Column(String)
     password = Column(String)
-    create_at = Column(DateTime)
+    created_at = Column(DateTime)
     todo_lists = relationship("ToDoList", backref="owner")
 
 
@@ -34,7 +33,7 @@ class ToDoList(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(100), nullable=False)
     description = Column(String(100))
-    create_at = Column(DateTime)
+    created_at = Column(DateTime)
     owner_id = Column(Integer, ForeignKey("users.id"))
     todos = relationship("ToDo", backref="list")
 
@@ -48,3 +47,4 @@ class ToDo(Base):
     status = Column(String(100), default="Unfinished")
     finished_at = Column(DateTime)
     list_id = Column(Integer, ForeignKey("lists.id"))
+    created_at = Column(DateTime)

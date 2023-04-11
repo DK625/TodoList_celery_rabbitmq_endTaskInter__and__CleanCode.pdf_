@@ -1,6 +1,7 @@
 from typing import List
 
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Request, Response, status
+from fastapi_pagination import LimitOffsetPage, Page, add_pagination, paginate
 from sqlalchemy.orm import Session
 
 from ... import errors
@@ -15,52 +16,48 @@ get_db = database.get_db
 
 @router.post("/", dependencies=[Depends(JWTBearer(Request))], response_model=schemas.CreateListResponse)
 def create_new_list(
-    request: Request,
-    response: Response,
-    payload: schemas.CreateListBody,
-    db: Session = Depends(get_db),
+    request: Request, response: Response, payload: schemas.CreateListBody, db: Session = Depends(get_db)
 ):
     try:
         key = (request.headers.get("authorization")).split(" ")[-1]
         auth_info = token.verify_token(key)
-        print("check: ", auth_info)
-        # post_list = list.create(payload, response, db)
+        user_id = auth_info["user_id"]
+        post_list = list.create(payload, user_id, response, db)
         return post_list
+    except errors.Used:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail={"error": "Information has been used!"})
     except errors.NotFound:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"error": "Not found!"})
-    except errors.IncorrectPasswordError:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail={"error": "Wrong password!"})
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"error": "Not found user!"})
 
 
-# @router.get('/', response_model=List[schemas.ShowBlog])
-@router.get("/", dependencies=[Depends(JWTBearer())])
-# def all(db: Session = Depends(get_db), current_user: schemas.User = Depends(oauth2.get_current_user)):
-def all(db: Session = Depends(get_db)):
-    return list.get_all(db)
+@router.get("/{id}", dependencies=[Depends(JWTBearer(Request))], response_model=schemas.GetListByIdResponse)
+def get_list_by_id(id: int, request: Request, response: Response, db: Session = Depends(get_db)):
+    try:
+        key = (request.headers.get("authorization")).split(" ")[-1]
+        auth_info = token.verify_token(key)
+        user_id = auth_info["user_id"]
+        get_list = list.get_list_id(user_id, id, response, db)
+        return get_list
+    except errors.NotFound:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"error": "List Not Found!"})
 
 
-# @router.post("/", status_code=status.HTTP_201_CREATED)
-# def create(
-#     request: schemas.Blog, db: Session = Depends(get_db), current_user: schemas.User = Depends(oauth2.get_current_user)
-# ):
-#     return list.create(request, db)
+@router.get("/", dependencies=[Depends(JWTBearer(Request))], response_model=Page[schemas.GetListByIdResponse])
+def get_list(request: Request, response: Response, db: Session = Depends(get_db)):
+    key = (request.headers.get("authorization")).split(" ")[-1]
+    auth_info = token.verify_token(key)
+    user_id = auth_info["user_id"]
+    get_list = list.get_list(user_id, response, db)
+    return get_list
 
 
-@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def destroy(id: int, db: Session = Depends(get_db), current_user: schemas.User = Depends(oauth2.get_current_user)):
-    return list.destroy(id, db)
-
-
-@router.put("/{id}", status_code=status.HTTP_202_ACCEPTED)
-def update(
-    id: int,
-    request: schemas.Blog,
-    db: Session = Depends(get_db),
-    current_user: schemas.User = Depends(oauth2.get_current_user),
-):
-    return list.update(id, request, db)
-
-
-@router.get("/{id}", status_code=200, response_model=schemas.ShowBlog)
-def show(id: int, db: Session = Depends(get_db), current_user: schemas.User = Depends(oauth2.get_current_user)):
-    return list.show(id, db)
+@router.delete("/", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(JWTBearer(Request))])
+def delete_list(id: int, request: Request, db: Session = Depends(get_db)):
+    try:
+        key = (request.headers.get("authorization")).split(" ")[-1]
+        auth_info = token.verify_token(key)
+        user_id = auth_info["user_id"]
+        delete_list = list.delete(user_id, id, db)
+        return delete_list
+    except errors.NotFound:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"error": "List Not Found!"})

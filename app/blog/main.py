@@ -1,10 +1,11 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse, PlainTextResponse
 from fastapi.security import HTTPBearer
+from fastapi_pagination import LimitOffsetPage, Page, add_pagination, paginate
 
 from . import models
 from .database import engine
-from .routers import authentication, list, user
+from .routers import authentication, list, todo
 
 app = FastAPI()
 
@@ -19,7 +20,8 @@ models.Base.metadata.create_all(engine)
 
 app.include_router(authentication.router)
 app.include_router(list.router)
-app.include_router(user.router)
+app.include_router(todo.router)
+add_pagination(app)
 
 # uvicorn app.blog.main:app --reload
 # {

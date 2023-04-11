@@ -8,3 +8,7 @@ class IncorrectPasswordError(Exception):
 
 class NotFound(Exception):
     pass
+
+
+class Used(Exception):
+    pass

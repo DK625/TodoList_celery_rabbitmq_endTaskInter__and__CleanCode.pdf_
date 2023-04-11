@@ -1,7 +1,9 @@
 from datetime import datetime
-from typing import List, Optional
+from enum import Enum
+from typing import Annotated, List, Optional, Union
 
-from pydantic import BaseModel, EmailStr, root_validator
+from pydantic import BaseModel, EmailStr, Field, root_validator
+from pydantic.schema import Dict, Optional
 
 
 class UserSignUpBody(BaseModel):  # DTO/Schema
@@ -19,10 +21,10 @@ class UserSignUpBody(BaseModel):  # DTO/Schema
 
 
 class UserSignUpResponse(BaseModel):
-    email: str
+    email: EmailStr
     name: str
     id: int
-    create_at: datetime
+    created_at: datetime
 
 
 class LoginBody(BaseModel):  # DTO/Schema
@@ -31,7 +33,9 @@ class LoginBody(BaseModel):  # DTO/Schema
 
 
 class LoginResponse(BaseModel):
-    token: str
+    token: str = Field(
+        default="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2ODExODI0MDd9.j7bP8zGtdy_GHm4zb_nN_nUy_kcGiyQZ_JFO7QTwSlQ"
+    )
 
 
 class CreateListBody(BaseModel):
@@ -42,9 +46,79 @@ class CreateListBody(BaseModel):
 class CreateListResponse(CreateListBody):
     id: int
     owner_id: int
-    create_at: datetime
+    created_at: datetime
 
 
+class GetListByIdResponse(BaseModel):
+    id: int
+    description: str
+    name: str
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class TodoStatus(str, Enum):
+    todo = "Unfinished"
+    finished = "Finished"
+
+
+class CreateTodoBody(BaseModel):
+    list_id: int
+    title: str = Field(default="None", title="The description of the item", max_length=300)
+    description: str
+    due_date: datetime
+
+
+class CreateTodoResponse(BaseModel):
+    list_id: int
+    title: str = Field(default="None")
+    description: str
+    due_date: datetime
+    id: int
+    status: TodoStatus
+    finished_at: Optional[datetime] = Field(default=None, example=None)
+    created_at: datetime
+
+
+class UpdateTodoBody(BaseModel):
+    todo_id: int
+    status: TodoStatus
+
+
+class UpdateTodoResponse(BaseModel):
+    list_id: int
+    title: str = Field(default="None")
+    description: str
+    due_date: datetime
+    id: int
+    status: TodoStatus
+    finished_at: Optional[datetime] = Field(default=None, example=None)
+    created_at: datetime
+
+
+class Todo(BaseModel):
+    list_id: int
+    title: str = Field(default="None")
+    description: str
+    due_date: datetime
+    id: int
+    status: TodoStatus
+    finished_at: Optional[datetime] = Field(default=None, example=None)
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class GetTodoStatus(str, Enum):
+    default = "All"
+    finished = "Finished"
+    unfinished = "Unfinished"
+
+
+# ......................................... #
 class BlogBase(BaseModel):
     title: str
     body: str

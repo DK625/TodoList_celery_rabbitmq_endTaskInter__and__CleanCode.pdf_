@@ -21,7 +21,7 @@ def sign_up(request: schemas.UserSignUpBody, response: Response, db: Session = D
 
 
 @router.post("/login", response_model=schemas.LoginResponse)
-def sign_up(request: schemas.LoginBody, response: Response, db: Session = Depends(get_db)):
+def login(request: schemas.LoginBody, response: Response, db: Session = Depends(get_db)):
     try:
         raw_user = user.login(request, response, db)
         return raw_user

@@ -1,5 +1,5 @@
 from fastapi import HTTPException, Request
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi.security import APIKeyHeader, HTTPAuthorizationCredentials, HTTPBearer
 
 from . import token
 
@@ -27,4 +27,7 @@ class JWTBearer(HTTPBearer):
             payload = token.verify_token(token=jwtoken)
         except:
             payload = None
-        return payload
+
+        if payload:
+            isTokenValid = True
+        return isTokenValid
