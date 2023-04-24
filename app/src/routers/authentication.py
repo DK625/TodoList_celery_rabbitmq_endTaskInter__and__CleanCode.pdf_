@@ -20,7 +20,8 @@ def sign_up(request: schemas.UserSignUpBody, db: Session = Depends(get_db)):
         raw_user = user.create(name, email, password, db)
         return raw_user
     except errors.DuplicateUserError:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail={"error": "Your email is already exist!"})
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail={
+                            "error": "Your email is already exist!"})
 
 
 @router.post("/login", response_model=schemas.LoginResponse)
@@ -32,5 +33,6 @@ def login(request: schemas.LoginBody, db: Session = Depends(get_db)):
         return raw_user
     except:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail={"error": "Wrong username or password informations"}
+            status_code=status.HTTP_404_NOT_FOUND, detail={
+                "error": "Wrong username or password informations"}
         )
