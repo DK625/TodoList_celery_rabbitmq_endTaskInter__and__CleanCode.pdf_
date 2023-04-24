@@ -32,7 +32,7 @@ def get_list_id(user_id, id, db: Session):
     # neu user_id khac list's owner_id
     if user_id != list_todo.owner_id:
         raise errors.NotFound()
-    return list
+    return list_todo
 
 
 def get_list(user_id, db: Session):
@@ -47,7 +47,9 @@ def delete_list(user_id, id, db: Session):
     # neu user_id khac list's owner_id
     if user_id != list_todo.owner_id:
         raise errors.NotFound()
+    todo_delete = db.query(models.ToDo).filter(models.ToDo.list_id == id).delete()
     list_delete = db.query(models.ToDoList).filter(models.ToDoList.id == id)
+    # list.todos = []
     list_delete.delete(synchronize_session=False)
     db.commit()
     return "done"

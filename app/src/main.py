@@ -15,7 +15,6 @@ app = FastAPI()
 async def http_exception_handler(request, exc: HTTPException):
     # print(exec)
     return JSONResponse(content={"error": str(exc.detail["error"])}, status_code=exc.status_code)
-    # return JSONResponse(content={"error": str(exc.detail["error"])}, status_code=exc.status_code)
 
 
 models.Base.metadata.create_all(engine)

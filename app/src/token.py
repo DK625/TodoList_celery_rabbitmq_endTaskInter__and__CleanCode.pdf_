@@ -27,4 +27,4 @@ def verify_token(token: str):
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return payload
     except JWTError:
-        raise TokenError("Loi roi ban ey")
+        raise TokenError("Invalid token!")

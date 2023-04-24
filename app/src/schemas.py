@@ -39,7 +39,7 @@ class LoginResponse(BaseModel):
 
 
 class User(BaseModel):
-    id: str
+    id: int
 
 
 class CreateListBody(BaseModel):
@@ -58,6 +58,7 @@ class GetListByIdResponse(BaseModel):
     description: str
     name: str
     created_at: datetime
+    owner_id: str
 
     class Config:
         orm_mode = True
@@ -72,7 +73,20 @@ class CreateTodoBody(BaseModel):
     list_id: int
     title: str = Field(default="None", title="The description of the item", max_length=300)
     description: str
-    due_date: datetime
+    # due_date: datetime
+    due_date: Optional[datetime]
+
+    @root_validator
+    def name_length(cls, values):
+        if len(values.get("title")) > 50:
+            raise ValueError("Title must be at most 50 characters")
+        return values
+
+    @root_validator
+    def check_description_length(cls, values):
+        if len(values.get("description")) > 1000:
+            raise ValueError("Description must be at most 1000 characters")
+        return values
 
 
 class CreateTodoResponse(BaseModel):
