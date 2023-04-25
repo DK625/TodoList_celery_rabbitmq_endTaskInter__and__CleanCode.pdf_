@@ -1,4 +1,3 @@
-# from ..session import Base, SessionLocal, engine
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 

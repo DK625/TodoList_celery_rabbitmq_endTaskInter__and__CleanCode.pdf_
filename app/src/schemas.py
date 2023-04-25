@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from enum import Enum
 from typing import Annotated, List, Optional, Union
 
@@ -94,6 +94,7 @@ class CreateTodoResponse(BaseModel):
     title: str = Field(default="None")
     description: str
     due_date: datetime
+    # due_date: datetime = Field(default_factory=lambda: datetime.now() + timedelta(minutes=15))
     id: int
     status: TodoStatus
     finished_at: Optional[datetime] = Field(default=None, example=None)

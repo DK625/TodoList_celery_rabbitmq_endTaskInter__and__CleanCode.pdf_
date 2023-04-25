@@ -6,6 +6,9 @@ from sqlalchemy.orm import Session
 from ... import errors
 from .. import models, schemas, token
 from ..hashing import Hash
+import pytz
+
+local_tz = pytz.timezone("Asia/Ho_Chi_Minh")
 
 
 def create_list(owner_id, name, description, db: Session):
@@ -16,9 +19,10 @@ def create_list(owner_id, name, description, db: Session):
     # truyen user_id khong ton tai
     if not user:
         raise errors.NotFound()
-    new_list = models.ToDoList(
-        name=name, description=description, created_at=datetime.utcnow().isoformat(), owner_id=owner_id
-    )
+    utc_now = datetime.utcnow().replace(tzinfo=pytz.utc)
+    local_now = utc_now.astimezone(local_tz)
+    created_at = local_now.isoformat()
+    new_list = models.ToDoList(name=name, description=description, created_at=created_at, owner_id=owner_id)
     db.add(new_list)
     db.commit()
     db.refresh(new_list)
