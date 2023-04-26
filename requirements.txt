@@ -5,3 +5,10 @@ passlib
 bcrypt
 python-jose
 python-multipart
+fastapi_pagination
+pymysql
+dotenv
+pydantic
+pika
+celery
+psycopg2-binary

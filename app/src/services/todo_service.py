@@ -23,9 +23,8 @@ def create_todo(list_id, title, description, due_date, owner_id, db: Session):
     todo = db.query(models.ToDo).filter(models.ToDo.title == title).first()
     if todo:
         raise errors.Used()
-    utc_now = datetime.utcnow().replace(tzinfo=pytz.utc)
-    local_now = utc_now.astimezone(local_tz)
-    created_at = local_now.isoformat()
+    utc_now = datetime.utcnow()
+    created_at = utc_now
     new_todo = models.ToDo(
         title=title,
         description=description,
@@ -36,7 +35,16 @@ def create_todo(list_id, title, description, due_date, owner_id, db: Session):
     db.add(new_todo)
     db.commit()
     db.refresh(new_todo)
-    return new_todo
+    return dict(
+        list_id=new_todo.list_id,
+        title=new_todo.title,
+        description=new_todo.description,
+        due_date=new_todo.due_date,
+        id=new_todo.id,
+        status=new_todo.status,
+        finished_at=new_todo.finished_at,
+        created_at=new_todo.created_at,
+    )
 
 
 def update_todo(todo_id, status, user_id, db: Session):
@@ -51,11 +59,8 @@ def update_todo(todo_id, status, user_id, db: Session):
         raise errors.NotFound()
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if status == "Finished":
-        # finished_at = datetime.utcnow().isoformat()
-        utc_now = datetime.utcnow().replace(tzinfo=pytz.utc)
-        local_now = utc_now.astimezone(local_tz)
-        finished_at = local_now.isoformat()
-        # finished_at = datetime.now().isoformat()
+        utc_now = datetime.utcnow()
+        finished_at = utc_now
     else:
         finished_at = None
     message = {"title": todo.title, "description": todo.description,
@@ -66,7 +71,16 @@ def update_todo(todo_id, status, user_id, db: Session):
     todos.update({"status": status, "finished_at": finished_at})
     db.commit()
     todo = db.query(models.ToDo).filter(models.ToDo.id == todo_id).first()
-    return todo
+    return dict(
+        list_id=todo.list_id,
+        title=todo.title,
+        description=todo.description,
+        due_date=todo.due_date,
+        id=todo.id,
+        status=todo.status,
+        finished_at=todo.finished_at,
+        created_at=todo.created_at,
+    )
 
 
 def get_todo(user_id, list_id, status, db: Session):
@@ -85,8 +99,8 @@ def get_todo(user_id, list_id, status, db: Session):
     return todo
 
 
-def delete_todo(user_id, id, db: Session):
-    todo = db.query(models.ToDo).filter(models.ToDo.id == id).first()
+def delete_todo(user_id, todo_id, db: Session):
+    todo = db.query(models.ToDo).filter(models.ToDo.id == todo_id).first()
     if not todo:
         raise errors.NotFound()
     list_todo = db.query(models.ToDoList).filter(
@@ -94,7 +108,6 @@ def delete_todo(user_id, id, db: Session):
     # neu user_id khac list's owner_id
     if user_id != list_todo.owner_id:
         raise errors.NotFound()
-    todo_delete = db.query(models.ToDo).filter(models.ToDo.id == id)
+    todo_delete = db.query(models.ToDo).filter(models.ToDo.id == todo_id)
     todo_delete.delete(synchronize_session=False)
     db.commit()
-    return "done"

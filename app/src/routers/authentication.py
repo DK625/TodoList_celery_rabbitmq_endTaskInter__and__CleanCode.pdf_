@@ -7,7 +7,7 @@ from .. import dependencies, models, schemas, token
 from ..hashing import Hash
 from ..repository import user
 
-router = APIRouter(tags=["Auth Sign Up and Login"])
+router = APIRouter()
 get_db = dependencies.get_db
 
 
@@ -33,6 +33,6 @@ def login(request: schemas.LoginBody, db: Session = Depends(get_db)):
         return raw_user
     except:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail={
+            status_code=status.HTTP_400_BAD_REQUEST, detail={
                 "error": "Wrong username or password informations"}
         )

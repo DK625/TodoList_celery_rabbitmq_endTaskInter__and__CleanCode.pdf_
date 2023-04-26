@@ -10,12 +10,13 @@ from .. import dependencies, models, schemas, token
 from fastapi import APIRouter, Depends
 import datetime
 from typing import List
+from ...config import settings
 
 
 @celery_app.task(name="send_email")
 def send_email(message):
-    email = "minhha10c8@gmail.com"
-    password = "mgolqbczagtknjlv"  # mật khẩu ứng dụng
+    email = settings.EMAIL
+    password = settings.PASSWORD  # mật khẩu ứng dụng
     smtp_server = "smtp.gmail.com"
     smtp_port = 587
     server = smtplib.SMTP(smtp_server, smtp_port)
@@ -48,9 +49,8 @@ def send_email(message):
 
 @celery_app.task(name="process_email_queue")
 def process_email_queue():
-    parameters = pika.URLParameters(
-        "amqp://roegjsyb:GLm6HM5YrT0XlJY34oJxPcyKFyftBv9-@armadillo.rmq.cloudamqp.com/roegjsyb"
-    )
+    parameters = pika.URLParameters(settings.BROKER_MESSAGE
+                                    )
     connection = pika.BlockingConnection(parameters)
     channel = connection.channel()
     channel.queue_declare(queue="email_queue")
@@ -60,7 +60,8 @@ def process_email_queue():
         send_email(message)
         print("Sent email:", message)
 
-    channel.basic_consume(queue="email_queue", on_message_callback=callback, auto_ack=True)
+    channel.basic_consume(queue="email_queue",
+                          on_message_callback=callback, auto_ack=True)
     print("Listening for emails...")
     channel.start_consuming()
 
@@ -68,7 +69,8 @@ def process_email_queue():
 @celery_app.task(name="check_due_date")
 def check_due_date():
     db = SessionLocal()
-    todos = db.query(models.ToDo).filter(models.ToDo.status == "Unfinished").all()
+    todos = db.query(models.ToDo).filter(
+        models.ToDo.status == "Unfinished").all()
     for todo in todos:
         create_at = todo.created_at
         due_date = todo.due_date
@@ -79,8 +81,10 @@ def check_due_date():
         time_diff = (due_date - current_time).total_seconds() / 60.0
         # if time_diff <= 15 and time_diff > 0:
         if time_diff <= 15 and time_diff > 0 and min_time >= 15:
-            list_todo = db.query(models.ToDoList).filter(models.ToDoList.id == todo.list_id).first()
-            user = db.query(models.User).filter(models.User.id == list_todo.owner_id).first()
+            list_todo = db.query(models.ToDoList).filter(
+                models.ToDoList.id == todo.list_id).first()
+            user = db.query(models.User).filter(
+                models.User.id == list_todo.owner_id).first()
             message = {
                 "receiver": user.email,
                 "title": todo.title,
@@ -100,7 +104,8 @@ def morning():
     for user in users:
         todo_to_complete = 0
         todo_overdue = 0
-        lists = db.query(models.ToDoList).filter(models.ToDoList.owner_id == user.id).all()
+        lists = db.query(models.ToDoList).filter(
+            models.ToDoList.owner_id == user.id).all()
         for list_todo in lists:
             todos = (
                 db.query(models.ToDo)

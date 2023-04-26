@@ -12,8 +12,8 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String)
-    email = Column(String)
-    password = Column(String)
+    email = Column(String, nullable=False)
+    password = Column(String, nullable=False)
     created_at = Column(DateTime)
     todo_lists = relationship("ToDoList", backref="owner")
 

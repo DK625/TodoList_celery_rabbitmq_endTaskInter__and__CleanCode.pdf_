@@ -7,7 +7,7 @@ from ..hashing import Hash
 from ..services import user_service
 
 
-def create(name, email, password, db: Session):
+def signup(name, email, password, db: Session):
     user = user_service.handle_user_sign_up(name, email, password, db)
     return dict(
         email=user.email,

@@ -34,7 +34,7 @@ class LoginBody(BaseModel):  # DTO/Schema
 
 class LoginResponse(BaseModel):
     token: str = Field(
-        default="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2ODEzMTIyNDF9.IEHuw0e9qgGdCrz--wNw4CiKoiMbvGoukXJrYiFFNyE"
+        # default="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2ODEzMTIyNDF9.IEHuw0e9qgGdCrz--wNw4CiKoiMbvGoukXJrYiFFNyE"
     )
 
 
@@ -71,7 +71,8 @@ class TodoStatus(str, Enum):
 
 class CreateTodoBody(BaseModel):
     list_id: int
-    title: str = Field(default="None", title="The description of the item", max_length=300)
+    title: str = Field(
+        default="None", title="The description of the item", max_length=300)
     description: str
     # due_date: datetime
     due_date: Optional[datetime]

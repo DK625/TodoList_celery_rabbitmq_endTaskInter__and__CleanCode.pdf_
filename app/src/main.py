@@ -19,7 +19,8 @@ async def http_exception_handler(request, exc: HTTPException):
 
 models.Base.metadata.create_all(engine)
 
-app.include_router(authentication.router)
-app.include_router(list_todo.router)
-app.include_router(todo.router)
+app.include_router(authentication.router, prefix="/auth",
+                   tags=["Authentication"])
+app.include_router(list_todo.router, prefix="/lists", tags=["Todo Lists"])
+app.include_router(todo.router, prefix="/todos", tags=["Todos"])
 add_pagination(app)

@@ -12,7 +12,7 @@ def handle_user_sign_up(name, email, password, db: Session):
     if user:
         raise errors.DuplicateUserError()
     new_user = models.User(
-        name=name, email=email, password=Hash.bcrypt(password), created_at=datetime.utcnow().isoformat()
+        name=name, email=email, password=Hash.bcrypt(password), created_at=datetime.utcnow()
     )
     db.add(new_user)
     db.commit()
