@@ -17,10 +17,12 @@ celery_app.conf.beat_schedule = {
     "check-due-date-every-15-minutes": {
         "task": "check_due_date",
         "schedule": datetime.timedelta(minutes=15),
+        # "schedule": datetime.timedelta(seconds=15),
     },
     "announcement_8am_every_day": {
         "task": "morning",
         "schedule": crontab(hour=8, minute=0),
+        # "schedule": datetime.timedelta(seconds=15),
     },
     # "check-due-date-every-15-seconds": {
     #     "task": "send_email",

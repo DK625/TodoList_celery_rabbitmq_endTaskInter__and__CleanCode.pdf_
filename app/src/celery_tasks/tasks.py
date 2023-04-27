@@ -43,7 +43,8 @@ def send_email(message):
 # celery -A app.src.celery_tasks.celery beat --loglevel=INFO
 # celery -A app.src.celery_tasks.celery worker --loglevel=INFO
 
-
+# minhha10c8@gmail.com
+# trinhduchoang625dora@gmail.com
 # 2023-04-25T09:51:02.340598
 
 
@@ -77,10 +78,13 @@ def check_due_date():
         min_time = (due_date - create_at).total_seconds() / 60.0
         # thời điểm tạo và hạn lớn hơn 15 phút
         current_time = datetime.datetime.now().replace(second=0, microsecond=0)
-        # 2023-04-25 12: 34: 56.789 - ->2023-04-25 12:34:00
         time_diff = (due_date - current_time).total_seconds() / 60.0
-        # if time_diff <= 15 and time_diff > 0:
-        if time_diff <= 15 and time_diff > 0 and min_time >= 15:
+        # print('todo_title: ', todo.title)
+        # print('due_date: ', due_date)
+        # print('current_time: ', current_time)
+        # print('time_diff: ', time_diff)
+        if time_diff <= 15 and time_diff > 0:
+            # if time_diff <= 15 and time_diff > 0 and min_time >= 15:
             list_todo = db.query(models.ToDoList).filter(
                 models.ToDoList.id == todo.list_id).first()
             user = db.query(models.User).filter(

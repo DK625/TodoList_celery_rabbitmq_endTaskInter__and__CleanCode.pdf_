@@ -15,7 +15,8 @@ router = APIRouter()
 get_db = dependencies.get_db
 
 
-@router.post("/", response_model=schemas.CreateListResponse)
+# @router.post("/", response_model=schemas.CreateListResponse)
+@router.post("/")
 def create_new_list(
     payload: schemas.CreateListBody,
     db: Session = Depends(get_db),

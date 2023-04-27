@@ -3,7 +3,7 @@ from fastapi_pagination import Page
 from sqlalchemy.orm import Session
 
 from ... import errors
-from .. import dependencies, models, oauth2, schemas, token
+from .. import dependencies, models, schemas, token
 
 # from ..jwt_bearer import JWTBearer
 from ..repository import todo

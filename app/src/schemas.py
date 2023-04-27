@@ -28,13 +28,12 @@ class UserSignUpResponse(BaseModel):
 
 
 class LoginBody(BaseModel):  # DTO/Schema
-    email: EmailStr
+    email: EmailStr = "minhha10c8@gmail.com"
     password: str
 
 
 class LoginResponse(BaseModel):
     token: str = Field(
-        # default="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2ODEzMTIyNDF9.IEHuw0e9qgGdCrz--wNw4CiKoiMbvGoukXJrYiFFNyE"
     )
 
 
@@ -75,7 +74,17 @@ class CreateTodoBody(BaseModel):
         default="None", title="The description of the item", max_length=300)
     description: str
     # due_date: datetime
-    due_date: Optional[datetime]
+    # due_date: Optional[datetime]
+    due_date: str = "2023-04-26 22:18:59.738"
+
+    @root_validator()
+    def validate_due_date(cls, value):
+        try:
+            datetime.strptime(value.get('due_date'), '%Y-%m-%d %H:%M:%S.%f')
+        except ValueError:
+            raise ValueError(
+                "Incorrect date format, should be 'YYYY-MM-DD HH:MM:SS.sss'")
+        return value
 
     @root_validator
     def name_length(cls, values):

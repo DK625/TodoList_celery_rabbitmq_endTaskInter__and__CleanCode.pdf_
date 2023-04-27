@@ -7,9 +7,9 @@ from ... import errors
 from .. import models, schemas, token
 from ..hashing import Hash
 from ..celery_tasks.tasks import send_email
-import pytz
+# import pytz
 
-local_tz = pytz.timezone("Asia/Ho_Chi_Minh")
+# local_tz = pytz.timezone("Asia/Ho_Chi_Minh")
 
 
 def create_todo(list_id, title, description, due_date, owner_id, db: Session):
